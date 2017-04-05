@@ -60,6 +60,11 @@ type AllTrades struct{
 	OpenTrades []AnOpenTrade `json:"open_trades"`
 }
 
+type Adminlogin struct{
+	Userid string `json:"userid"`					//User login for system Admin
+	Password string `json:"password"`
+}
+
 // ============================================================================================================================
 // Main
 // ============================================================================================================================
@@ -76,11 +81,31 @@ func main() {
 func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	var Aval int
 	var err error
+	
+//Comment line for Hertz Blockchain
+	//if len(args) != 1 {
+	//	return nil, errors.New("Incorrect number of arguments. Expecting 1")
+	//}
+//****
+	
+//Changes for the Hertz Blockchain
 
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 1")
+   if len(args) != 2 {
+	   return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
-
+    //Write the User Id "mail Id" arg[0] and password arg[1]
+	userid := args[0]															//argument for UserID
+	password := args[1]  	//argument for password
+	str := `{"userid": "` + userid+ `", "password": "` + password + `"}`
+	
+	err = stub.PutState(userid, []byte(str))								//Put the userid and password in blockchain
+	if err != nil {
+		return nil, err
+	}
+	
+	
+//End of Changes for the Hertz Blockchain
+	
 	// Initialize the chaincode
 	Aval, err = strconv.Atoi(args[0])
 	if err != nil {
@@ -147,7 +172,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return res, err
 	} else if function == "remove_trade" {									//cancel an open trade order
 		return t.remove_trade(stub, args)
-	}
+	} 
 	fmt.Println("invoke did not find func: " + function)					//error
 
 	return nil, errors.New("Received unknown function invocation")
@@ -162,7 +187,9 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	// Handle different functions
 	if function == "read" {													//read a variable
 		return t.read(stub, args)
-	}
+	} else if function == "read_sysadmin" {									//Read system admin User id and password
+		return t.read_sysadmin(stub, args)
+	} 
 	fmt.Println("query did not find func: " + function)						//error
 
 	return nil, errors.New("Received unknown function query")
@@ -188,6 +215,37 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 
 	return valAsbytes, nil													//send it onward
 }
+
+//==============================================================================================================================
+// Read - query function to read key/value pair (System Admin read User id and Password)
+//===============================================================================================================================
+func (t *SimpleChaincode) read_sysadmin(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+
+	if len(args) != 1 {
+		return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
+	}
+
+	userid := args[0]
+	PassAsbytes, err := stub.GetState(userid)
+	
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + userid + "\"}"
+		return nil, errors.New(jsonResp)
+	}
+	
+	res := Adminlogin{}
+	json.Unmarshal(PassAsbytes,&res)
+	
+	if res.Userid == userid{
+	   fmt.Println("Userid Password Matched: " +res.Userid + res.Password)
+	  }else {
+	   fmt.Println("Wrong ID Password: " +res.Userid + res.Password)
+	   }
+	
+	return PassAsbytes, nil
+}
+
 
 // ============================================================================================================================
 // Delete - remove a key/value pair from state
