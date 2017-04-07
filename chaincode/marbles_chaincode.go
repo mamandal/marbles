@@ -90,9 +90,9 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	
 //Changes for the Hertz Blockchain
 
-   if len(args) != 2 {
-	   return nil, errors.New("Incorrect number of arguments. Expecting 1")
-	}
+   //if len(args) != 2 {
+	//   return nil, errors.New("Incorrect number of arguments. Expecting 1")
+	//}
     //Write the User Id "mail Id" arg[0] and password arg[1]
 	//userid := args[0]															//argument for UserID
 	//password := args[1]  	//argument for password
