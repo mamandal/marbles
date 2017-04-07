@@ -94,8 +94,11 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	   return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
     //Write the User Id "mail Id" arg[0] and password arg[1]
-	userid := args[0]															//argument for UserID
-	password := args[1]  	//argument for password
+	//userid := args[0]															//argument for UserID
+	//password := args[1]  	//argument for password
+	userid :="3456"
+	password :="amitc"
+    fmt.Println("User id: " +userid)
 	str := `{"userid": "` + userid+ `", "password": "` + password + `"}`
 	
 	err = stub.PutState(userid, []byte(str))								//Put the userid and password in blockchain
