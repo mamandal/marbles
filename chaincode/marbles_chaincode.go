@@ -374,7 +374,7 @@ func (t *SimpleChaincode) signup_driver(stub shim.ChaincodeStubInterface, args [
 	//}
 
 	//check if marble already exists
-	_ driverAsBytes, err := stub.GetState(email)
+	driverAsBytes, err := stub.GetState(email)
 	if err != nil {
 		return nil, errors.New("Failed to get driver name")
 	}
