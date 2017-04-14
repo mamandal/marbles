@@ -394,7 +394,7 @@ func (t *SimpleChaincode) signup_driver(stub shim.ChaincodeStubInterface, args [
 	}
 		
 	//get the driver index
-	_ driversAsBytes, err := stub.GetState(driverIndexStr)
+	driversAsBytes, err := stub.GetState(driverIndexStr)
 	if err != nil {
 		return nil, errors.New("Failed to get driver index")
 	}
@@ -408,6 +408,8 @@ func (t *SimpleChaincode) signup_driver(stub shim.ChaincodeStubInterface, args [
 	err = stub.PutState(driverIndexStr, jsonAsBytes)						//store name of marble
 
 	fmt.Println("- end signup driver")
+	
+	_ = driversAsBytes
 	return nil, nil
 }
 
